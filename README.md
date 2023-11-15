@@ -1,6 +1,16 @@
 # RandomZAP
 O RandomZAP é um projeto de sistemas distribuidos que conecta dois clientes desconhecidos de forma aleatória, em um chat.
 
+## Características de Sistemas Distribuidos
+- Pear to Pear (P2P)
+- Cliente-Servidor
+
+## Tecnologias 
+-FrontEnd: Angular
+-BackEnd: Django
+-WebRTC
+-MySQL
+
 ## Funcionalidades
 ### Fluxo Principal
 - O cliente podera realizar a criação de uma conta
@@ -10,6 +20,11 @@ O RandomZAP é um projeto de sistemas distribuidos que conecta dois clientes des
 - O cliente podera se logar
 - Entrar em uma fila de conversa
 - Mandar mensagens de texto no chat
+
+### Fluxo Alternativo
+- Cliente pode cancelar uma espera na fila
+- Cliente pode sair de uma conversa
+- Cliente pode deslogar
 
 ### Fluxo Idealizado
 - Cliente podera mandar imagens
