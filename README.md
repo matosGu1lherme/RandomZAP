@@ -33,7 +33,7 @@ O RandomZAP é um projeto de sistemas distribuidos que conecta dois clientes des
 
 ### Arquitetura
 
-pensar na criptografia
+<img src="arquiteturaSD.png">
 
 ## Equipe
 - Catarine Cruz
