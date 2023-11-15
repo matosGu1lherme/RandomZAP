@@ -1,53 +1,50 @@
 const express = require("express");
 const WebSocket = require("ws");
 const http = require("http");
-const { v4: uuidv4 } = require("uuid");
+const uuidv4 = require("uuid/v4");
+
 const app = express();
 
 const port = process.env.PORT || 9000;
 
-//Inicializando um http server
+//initialize a http server
 const server = http.createServer(app);
 
-//Inicializando WebSocket
+//initialize the WebSocket server instance
 const wss = new WebSocket.Server({ server });
 
-// create an object to store users
 let users = {};
 
-// utility to send message to one user
 const sendTo = (connection, message) => {
   connection.send(JSON.stringify(message));
 };
 
-// utility to send message to all users
-
 const sendToAll = (clients, type, { id, name: userName }) => {
-  Object.values(clients).forEach((client) => {
-    if (client.name !== userName) {
+  Object.values(clients).forEach(client => {
+    if(client.name !== userName) {
       client.send(
         JSON.stringify({
           type,
-          user: { id, userName },
+          user: { id, userName }
         })
-      );
+      )
     }
-  });
+  })
 };
 
-wss.on("connection", (ws) => {
-  ws.on("message", (msg) => {
+wss.on("connection", ws => {
+  ws.on("message", msg => {
+    console.log("Received message: %s", msg);
     let data;
+
     //accepting only JSON messages
     try {
-      console.log("Received message: %s from client", msg);
       data = JSON.parse(msg);
     } catch (e) {
       console.log("Invalid JSON");
       data = {};
     }
-    const { type, name, offer, answer } = data;
-    //Handle message by type
+    const { type, name, offer, answer, candidate } = data;
     switch (type) {
       //when a user tries to login
       case "login":
@@ -56,74 +53,105 @@ wss.on("connection", (ws) => {
           sendTo(ws, {
             type: "login",
             success: false,
-            message: "Username is unavailable",
+            message: "Username is unavailable"
           });
         } else {
           const id = uuidv4();
-          const loggedIn = Object.values(users).map(
-            ({ id, name: userName }) => ({ id, userName })
-          );
+          const loggedIn = Object.values(
+            users
+          ).map(({ id, name: userName }) => ({ id, userName }));
+          // const loggedIn = Object.keys(users).map(user => ({ userName: user }));
           users[name] = ws;
           ws.name = name;
           ws.id = id;
+
           sendTo(ws, {
             type: "login",
             success: true,
-            users: loggedIn,
+            users: loggedIn
           });
           sendToAll(users, "updateUsers", ws);
+        }
+        break;
+      case "offer":
+        //if UserBexists then send him offer details
+        const offerRecipient = users[name];
+
+        if (!!offerRecipient) {
+          //setting that sender connected with cecipient
+          ws.otherName = name;
+          sendTo(offerRecipient, {
+            type: "offer",
+            offer,
+            name: ws.name
+          });
+        }
+        break;
+      case "answer":
+        //for ex. UserB answers UserA
+        const answerRecipient = users[name];
+
+        if (!!answerRecipient) {
+          ws.otherName = name;
+          sendTo(answerRecipient, {
+            type: "answer",
+            answer
+          });
+        }
+        break;
+      case "candidate":
+        const candidateRecipient = users[name];
+
+        if (!!candidateRecipient) {
+          sendTo(candidateRecipient, {
+            type: "candidate",
+            candidate
+          });
+        }
+        break;
+      case "leave":
+        recipient = users[name];
+
+        //notify the other user so he can disconnect his peer connection
+        if (!!recipient) {
+          recipient.otherName = null;
+          sendTo(recipient, {
+            type: "leave"
+          });
         }
         break;
       default:
         sendTo(ws, {
           type: "error",
-          message: "Command not found: " + type,
+          message: "Command not found: " + type
         });
-        break;
-
-      case "offer":
-        //Check if user to send offer to exists
-        const offerRecipient = users[name];
-        if (!!offerRecipient) {
-          sendTo(offerRecipient, {
-            type: "offer",
-            offer,
-            name: ws.name,
-          });
-        } else {
-          sendTo(ws, {
-            type: "error",
-            message: `User ${name} does not exist!`,
-          });
-        }
-        break;
-
-      case "answer":
-        //Check if user to send answer to exists
-        const answerRecipient = users[name];
-        if (!!answerRecipient) {
-          sendTo(answerRecipient, {
-            type: "answer",
-            answer,
-          });
-        } else {
-          sendTo(ws, {
-            type: "error",
-            message: `User ${name} does not exist!`,
-          });
-        }
         break;
     }
   });
-  //send immediate a feedback to the incoming connection
+
+  ws.on("close", function() {
+    if (ws.name) {
+      delete users[ws.name];
+      if (ws.otherName) {
+        console.log("Disconnecting from ", ws.otherName);
+        const recipient = users[ws.otherName];
+        if (!!recipient) {
+          recipient.otherName = null;
+        }
+      }
+      sendToAll(users, "removeUser", ws);
+    }
+  });
+  //send immediatly a feedback to the incoming connection
   ws.send(
     JSON.stringify({
       type: "connect",
-      message: "Well hello there, I am a WebSocket server",
+      message: "Well hello there, I am a WebSocket server"
     })
   );
 });
 
+//start our server
 server.listen(port, () => {
-  console.log(`Signaling Server running on port: ${port}`);
+  console.log(`Server started on port ${server.address().port} :)`);
 });
