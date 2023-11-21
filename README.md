@@ -6,10 +6,10 @@ O RandomZAP é um projeto de sistemas distribuidos que conecta dois clientes des
 - Cliente-Servidor
 
 ## Tecnologias 
-- FrontEnd: Angular
-- BackEnd: Django
+- FrontEnd: React
+- BackEnd: Node
 - WebRTC
-- MySQL
+- Banco de Dados: MySQL
 
 ## Funcionalidades
 ### Fluxo Principal
