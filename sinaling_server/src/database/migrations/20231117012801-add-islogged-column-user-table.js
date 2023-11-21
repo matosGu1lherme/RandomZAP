@@ -5,7 +5,7 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     return queryInterface.addColumn(
       'users',
-      'isLogged',
+      'is_logged',
       {
         type: Sequelize.BOOLEAN
       }
@@ -15,7 +15,7 @@ module.exports = {
   async down (queryInterface, Sequelize) {
    return queryInterface.removeColumn(
     'users',
-    'isLogged',
+    'is_logged',
    );
   }
 };

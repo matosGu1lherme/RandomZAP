@@ -2,6 +2,7 @@ const express = require("express");
 const WebSocket = require("ws");
 const http = require("http");
 const uuidv4 = require("uuid/v4");
+const cors = require('cors');
 
 const routes = require('./routes.js');
 
@@ -9,7 +10,8 @@ require('./database');
 
 const app = express();
 
-//app.use(express.json());
+app.use(cors());
+app.use(express.json());
 app.use(routes);
 
 const port = process.env.PORT || 9000;
