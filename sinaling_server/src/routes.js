@@ -10,9 +10,10 @@ router.post('/users/login', UserController.login);
 
 router.post('/users', UserController.store);
 
+router.get('/users', UserController.index);
 router.use(authMiddleware);
 
-router.get('/users', UserController.index);
+
 
 router.put('/users/:user_id', UserController.update);
 

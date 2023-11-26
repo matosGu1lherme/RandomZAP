@@ -10,9 +10,11 @@ import {
 } from "semantic-ui-react";
 import SweetAlert from "react-bootstrap-sweetalert";
 import { format } from "date-fns";
-import "./App.css";
+import "./stylesApp.css";
 import UsersList from "./UsersList";
 import MessageBox from "./MessageBox";
+import axios from "axios";
+import signin from "../Signin";
 
 // Use for remote connections
 const configuration = {
@@ -37,7 +39,7 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
   const [message, setMessage] = useState("");
   const messagesRef = useRef({});
   const [messages, setMessages] = useState({});
-
+  
   useEffect(() => {
     webSocket.current = new WebSocket('ws://localhost:9000');
     webSocket.current.onmessage = message => {
@@ -58,6 +60,7 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
           setSocketOpen(true);
           break;
         case "login":
+            console.log("oii")
           onLogin(data);
           break;
         case "updateUsers":
@@ -80,6 +83,14 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
       }
     }
   }, [socketMessages]);
+
+  useEffect(() => {
+    // Faça uma solicitação para a rota do back-end
+    axios.get('http://localhost:9000/users')
+      .then(response => setUsers(response.data))
+      .catch(error => console.error('Erro ao obter usuários:', error));
+  }, []); 
+  console.log(users);
 
   const closeAlert = () => {
     setAlert(null);
@@ -122,7 +133,70 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
     }
   };
 
-  const onLogin = ({ success, message, users: loggedIn }) => {
+// const onLogin = async ({ status, message, user, token}) => {
+//     console.log("aqui");
+//     setLoggingIn(false);
+  
+//     if (status === 1) {
+//       setAlert(
+//         <SweetAlert
+//           success
+//           title="Success!"
+//           onConfirm={closeAlert}
+//           onCancel={closeAlert}
+//         >
+//           {message}
+//         </SweetAlert>
+//       );
+  
+//       setIsLoggedIn(true);
+//       setUsers([user]); // Se necessário, ajuste como os usuários são definidos
+  
+//       // Chame a função de login do contexto do chat
+//       //await signin(email, senha);
+  
+//       let localConnection = new RTCPeerConnection(configuration);
+//       console.log(localConnection);
+//       //when the browser finds an ice candidate we send it to another peer
+//       localConnection.onicecandidate = ({ candidate }) => {
+//         let connectedTo = connectedRef.current;
+
+//         if (candidate && !!connectedTo) {
+//           send({
+//             name: connectedTo,
+//             type: "candidate",
+//             candidate
+//           });
+//         }
+//       };
+//       localConnection.ondatachannel = event => {
+//         console.log("Data channel is created!");
+//         let receiveChannel = event.channel;
+//         receiveChannel.onopen = () => {
+//           console.log("Data channel is open and ready to be used.");
+//         };
+//         receiveChannel.onmessage = handleDataChannelMessageReceived;
+//         updateChannel(receiveChannel);
+//       };
+//       updateConnection(localConnection);
+//       // Restante do código...
+//     } else {
+//       // Trate falhas de login aqui
+//       setAlert(
+//         <SweetAlert
+//           warning
+//           confirmBtnBsStyle="danger"
+//           title="Failed"
+//           onConfirm={closeAlert}
+//           onCancel={closeAlert}
+//         >
+//           {message}
+//         </SweetAlert>
+//       );
+//     }
+//   };
+  
+const onLogin = ({ success, message, users: loggedIn }) => {
     setLoggingIn(false);
     if (success) {
       setAlert(
@@ -238,6 +312,11 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
   };
 
   const handleConnection = name => {
+    if (!connection) {
+        console.error("Connection is not initialized.");
+        return;
+    }
+
     var dataChannelOptions = {
       reliable: true
     };
@@ -283,12 +362,15 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
   };
 
   const toggleConnection = userName => {
+    console.log("nome: " + userName);
     if (connectedRef.current === userName) {
+        console.log("no if")
       setConnecting(true);
       setConnectedTo("");
       connectedRef.current = "";
       setConnecting(false);
     } else {
+        console.log("no else" + userName)
       setConnecting(true);
       setConnectedTo(userName);
       connectedRef.current = userName;

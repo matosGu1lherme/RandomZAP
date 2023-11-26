@@ -1,21 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,  useRef} from "react";
 import Input from "../../components/Input";
 import Button from "../../components/Button";
 import * as C from "./styles";
 import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import axios from 'axios';
+import onLogin from '../Home/Chat';
 
 const Signin = () => {
   const { signin } = useAuth();
   const navigate = useNavigate();
-
+  const webSocket = useRef(null);
+  const [loggingIn, setLoggingIn] = useState(false);
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [senha, setSenha] = useState("");
   const [error, setError] = useState("");
   const [isLogged, setIsLogged] = useState(false);
 
   const handleLogin = async () => {
+  
     if (!email || !senha) {
       setError("Preencha todos os campos");
       return;
@@ -29,13 +33,11 @@ const Signin = () => {
       });
       await signin(email, senha);
       // Trate a resposta conforme necessário, armazene o token, redirecione, etc.
-      const { user, token } = response.data;
+      const {user, token } = response.data;
       localStorage.setItem('user_token', JSON.stringify({ email, token }));
-
       navigate("/home");
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Erro desconhecido';
-
       // Trate os erros de requisição
       setError(errorMessage);
     }

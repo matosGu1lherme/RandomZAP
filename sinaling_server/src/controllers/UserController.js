@@ -60,16 +60,23 @@ module.exports = {
     },
 
     async index(req, res) {
-
-        const users = await User.findAll();
-
-        if(users == "" || users == null){
-            return res.status(200).send({message: "Nunhum usuário cadastrado."});
+        try {
+          const users = await User.findAll({
+            where: {
+              isLogged: 1,
+            },
+          });
+      
+          if (!users || users.length === 0) {
+            return res.status(200).send({ message: "Nenhum usuário logado." });
+          }
+      
+          return res.status(200).send({ users });
+        } catch (error) {
+          console.error("Erro ao obter usuários:", error);
+          return res.status(500).send({ message: "Erro interno do servidor." });
         }
-
-        return res.status(200).send({ users });
-
-    },
+      },      
 
     async store(req, res) {
         const {name, nickname, password, email, photo } = req.body;
