@@ -15,6 +15,7 @@ import UsersList from "./UsersList";
 import MessageBox from "./MessageBox";
 import axios from "axios";
 import signin from "../Signin";
+import useAuth from "../../hooks/useAuth";
 
 // Use for remote connections
 const configuration = {
@@ -26,6 +27,7 @@ const configuration = {
 
 const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
   const [socketOpen, setSocketOpen] = useState(false);
+  const { user, login } = useAuth();
   const [socketMessages, setSocketMessages] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [name, setName] = useState("");
@@ -84,13 +86,35 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
     }
   }, [socketMessages]);
 
-  useEffect(() => {
-    // Faça uma solicitação para a rota do back-end
-    axios.get('http://localhost:9000/users')
-      .then(response => setUsers(response.data))
-      .catch(error => console.error('Erro ao obter usuários:', error));
-  }, []); 
-  console.log(users);
+//   useEffect(() => {
+//     // Faça uma solicitação para a rota do back-end
+//     axios.get('http://localhost:9000/users')
+//       .then(response => setUsers(response.data))
+//       .catch(error => console.error('Erro ao obter usuários:', error));
+//   }, []); 
+
+const toggleRandomConnection = () => {
+    if (loggedIn.length < 3) {
+      console.log("Não há usuários suficientes para conectar.");
+      return;
+    }
+  
+    let randomIndex;
+    do {
+    // Obtenha um índice aleatório
+    randomIndex = Math.floor(Math.random() * users.length);
+    } while (randomIndex === 0);
+  
+    // Selecione o usuário aleatório
+    const randomUser = loggedIn[randomIndex];
+  
+    // Inicie a conexão com o usuário aleatório
+    console.log("tratala"+randomUser.userName + ramdomIndex);
+    handleConnection(randomUser.userName);
+  };
+  
+
+ 
 
   const closeAlert = () => {
     setAlert(null);
@@ -100,12 +124,14 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
     webSocket.current.send(JSON.stringify(data));
   };
 
-  const handleLogin = () => {
+  const handleLogin = (user) => {
+    console.log(JSON.stringify(users, null, 2));
     setLoggingIn(true);
     send({
       type: "login",
-      name
+      name: user.nickname,
     });
+    console.log("name:" +  user.nickname)
   };
 
   const updateUsersList = ({ user }) => {
@@ -211,12 +237,16 @@ const onLogin = ({ success, message, users: loggedIn }) => {
       );
       setIsLoggedIn(true);
       setUsers(loggedIn);
+      console.dir("users lista: "+ loggedIn);
+      console.log("users:0" + users);
+      console.log(JSON.stringify(loggedIn, null, 2));
+      console.log(loggedIn[0]);
+      console.log(loggedIn[1]);
       let localConnection = new RTCPeerConnection(configuration);
       console.log(localConnection);
       //when the browser finds an ice candidate we send it to another peer
       localConnection.onicecandidate = ({ candidate }) => {
         let connectedTo = connectedRef.current;
-
         if (candidate && !!connectedTo) {
           send({
             name: connectedTo,
@@ -390,27 +420,30 @@ const onLogin = ({ success, message, users: loggedIn }) => {
           <Grid centered columns={4}>
             <Grid.Column>
               {(!isLoggedIn && (
-                <Input
-                  fluid
-                  disabled={loggingIn}
-                  type="text"
-                  onChange={e => setName(e.target.value)}
-                  placeholder="Username..."
-                  action
-                >
-                  <input />
+                // <Input
+                //   fluid
+                //   disabled={loggingIn}
+                //   type="text"
+                //   onChange={e => setName(e.target.value)}
+                //   placeholder="Username..."
+                //   action
+                // >
+                //   <input />
+                <div>
+                <p>Deseja iniciar uma conversa?</p>
                   <Button
-                    color="teal"
-                    disabled={!name || loggingIn}
-                    onClick={handleLogin}
+                    // color="teal"
+                    // disabled={!name || loggingIn}
+                    onClick={() => handleLogin(user)}
                   >
                     <Icon name="sign-in" />
-                    Login
+                    Iniciar
                   </Button>
-                </Input>
+                  </div>
+                // {/* </Input> */}
               )) || (
                 <Segment raised textAlign="center" color="olive">
-                  Logged In as: {name}
+                  Logged In as: {user.nickname}
                 </Segment>
               )}
             </Grid.Column>
@@ -430,6 +463,14 @@ const onLogin = ({ success, message, users: loggedIn }) => {
               sendMsg={sendMsg}
               name={name}
             />
+            <Button
+            onClick={() => toggleRandomConnection()}
+            disabled={!loggingIn || loggingIn.length < 2}
+            >
+            <Icon name="random" />
+            Conectar Aleatoriamente
+            </Button>
+
           </Grid>
         </Fragment>
       )) || (

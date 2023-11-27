@@ -7,7 +7,8 @@ import useAuth from "../../hooks/useAuth";
 import axios from 'axios';
 import onLogin from '../Home/Chat';
 
-const Signin = () => {
+const Signin = ({onLogin}) => {
+
   const { signin } = useAuth();
   const navigate = useNavigate();
   const webSocket = useRef(null);
@@ -35,6 +36,8 @@ const Signin = () => {
       // Trate a resposta conforme necessário, armazene o token, redirecione, etc.
       const {user, token } = response.data;
       localStorage.setItem('user_token', JSON.stringify({ email, token }));
+      //onLogin(user.nickname);
+      //console.log(user.nickname);
       navigate("/home");
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Erro desconhecido';

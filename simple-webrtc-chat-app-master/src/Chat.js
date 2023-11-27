@@ -97,6 +97,29 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
     });
   };
 
+  const toggleRandomConnection = (users) => {
+    
+    if (users.length < 2) {
+      console.log("Não há usuários suficientes para conectar.");
+      return;
+    }
+  
+    let randomIndex;
+    do {
+    // Obtenha um índice aleatório
+    randomIndex = Math.floor(Math.random() * users.length);
+    } while (randomIndex === 0);
+    console.log(users[1].userName);
+    // Selecione o usuário aleatório
+    const randomUser = users[randomIndex];
+    console.log(randomIndex);
+    console.log(users[randomIndex]);
+    // Inicie a conexão com o usuário aleatório
+    console.log(users[randomIndex].userName);
+    toggleConnection(users[randomIndex].userName);
+    
+  };
+
   const updateUsersList = ({ user }) => {
     setUsers(prev => [...prev, user]);
   };
@@ -137,6 +160,9 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
       );
       setIsLoggedIn(true);
       setUsers(loggedIn);
+      console.dir("users lista: "+ loggedIn);
+      console.log("users:0" + users);
+      console.log(JSON.stringify(loggedIn, null, 2));
       let localConnection = new RTCPeerConnection(configuration);
       console.log(localConnection);
       //when the browser finds an ice candidate we send it to another peer
@@ -283,6 +309,7 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
   };
 
   const toggleConnection = userName => {
+    console.log("togle"+userName);
     if (connectedRef.current === userName) {
       setConnecting(true);
       setConnectedTo("");
@@ -348,6 +375,13 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
               sendMsg={sendMsg}
               name={name}
             />
+            <Button
+            onClick={() => toggleRandomConnection(users)}
+            disabled={!users || users.length < 2}
+            >
+            <Icon name="random" />
+            Conectar Aleatoriamente
+            </Button>
           </Grid>
         </Fragment>
       )) || (
