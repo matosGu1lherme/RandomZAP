@@ -40,6 +40,7 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
 
   useEffect(() => {
     webSocket.current = new WebSocket('ws://localhost:9000');
+    console.log("entou CONEXAO")
     webSocket.current.onmessage = message => {
       const data = JSON.parse(message.data);
       setSocketMessages(prev => [...prev, data]);
@@ -56,6 +57,7 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
       switch (data.type) {
         case "connect":
           setSocketOpen(true);
+          console.log("CONECTOU SWITCH")
           break;
         case "login":
           onLogin(data);

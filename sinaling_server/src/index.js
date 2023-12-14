@@ -156,7 +156,7 @@ wss.on("connection", ws => {
     JSON.stringify({
       type: "connect",
       message: "Well hello there, I am a WebSocket server"
-    })
+    }),
   );
 });
 
