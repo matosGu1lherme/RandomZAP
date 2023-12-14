@@ -58,7 +58,7 @@ const MessageBox = ({ messages, connectedTo, message, setMessage, sendMsg, name 
               action
             >
               <input />
-              <Button color="teal" disabled={!message} onClick={sendMsg}>
+              <Button color="yellow" disabled={!message} onClick={sendMsg}>
                 <Icon name="send" />
                 Send Message
               </Button>

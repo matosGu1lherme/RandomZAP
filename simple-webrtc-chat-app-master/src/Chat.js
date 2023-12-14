@@ -13,6 +13,9 @@ import { format } from "date-fns";
 import "./App.css";
 import UsersList from "./UsersList";
 import MessageBox from "./MessageBox";
+import logoZap from "./rzapLogo-1.png";
+import style from "./style/style.module.css"
+
 
 // Use for remote connections
 const configuration = {
@@ -327,8 +330,8 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
     <div className="App">
       {alert}
       <Header as="h2" icon>
-        <Icon name="users" />
-        RandomZap Chat
+        <img src={logoZap}></img>
+        <span className={style.TitleZap}>RandomZap Chat</span>
       </Header>
       {(socketOpen && (
         <Fragment>
@@ -345,7 +348,7 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
                 >
                   <input />
                   <Button
-                    color="teal"
+                    color="yellow"
                     disabled={!name || loggingIn}
                     onClick={handleLogin}
                   >
