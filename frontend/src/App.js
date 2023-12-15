@@ -11,7 +11,7 @@ const ConnectionContext = createContext({
   const ChannelContext = createContext({
     channel: null,
     updateChannel: () => {}
-  });
+  });  
 
 const App = () => {
     const [connection, setconnection] = useState(null);
@@ -41,10 +41,10 @@ const App = () => {
           <ConnectionContext.Provider value={{ connection, updateConnection }}>
             <ChannelContext.Provider value={{ channel, updateChannel }}>
               <RoutesApp />
-              <Container />
+              {/* <Container /> */}
             </ChannelContext.Provider>
           </ConnectionContext.Provider>
-          <GlobalStyle />
+           <GlobalStyle /> 
         </AuthProvider>
       );
       
