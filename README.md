@@ -31,7 +31,17 @@ O RandomZAP é um projeto de sistemas distribuidos que conecta dois clientes des
 
 - Cliente podera conversar com **N** pessoas aleatorias
 
-### Funcionamento
+## Stun-SERVER
+Para realizar a conexão passando pelo NAT, é necessario realizar antes uma conexão com o stun server para solicitar dados como, IP e Portas publicas de conexão.
+
+O servidor-STUN usado foi o servidor publico da google(url: stun:stun.1.google.com:19302), que retornava os dados necessarios para estabelecimento da conexão.
+
+## Sinaling- Server
+Servidor intermediario desenvolvidor durante o projeto que organiza a comunicação entre os usuarios, ate que eles possam se tornar cadidatos ICE, compartilhando uma conexão SDP.
+
+O servidor recebe conexões dos usúarios da interface grafíca, por meio de WebSocket, e administra ofertas e respostas, para dar inicio a uma conexão peer to peer
+
+## Funcionamento
 1 - O clientes são reconhecidos como candidatos a uma potencial conexão, porém por regras de firewall e NAT a conexão entre dois browser é dificultada.
 
 2 - Para isso é usado um STUN server, que no caso é um servidor publico google que quando requisitado pela biblioteca Peer.js retorna informações necessarias para que ocorra a conexão entre dois Hosts
@@ -40,6 +50,18 @@ O RandomZAP é um projeto de sistemas distribuidos que conecta dois clientes des
 
 4 - É encaminhado ao Sinaling-Server uma conexão SDP que contem os dados necessarios para realizar a conexão, nela podem ser vinculados dados como permições de audio, video etc, porém no caso do Chat usaremos apenas uma coneção de para troca de dados simples
 
+5 - O servidor encaminha a mensagem para o candidato escolhido, e atravez dos dados da conexão SDP é estabelecido uma conexão peerTopeer
+
+## Como Rodar
+#### Sinalig Server
+* cd sinaling_server
+* yarn install
+* node src/index.js
+
+#### Chat Web
+* cd chat_web
+* yarn install
+* yarn start
 
 
 ### Arquitetura
