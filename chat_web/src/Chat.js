@@ -6,7 +6,7 @@ import {
   Grid,
   Segment,
   Button,
-  Loader
+  Loader,
 } from "semantic-ui-react";
 import SweetAlert from "react-bootstrap-sweetalert";
 import { format } from "date-fns";
@@ -14,12 +14,11 @@ import "./App.css";
 import UsersList from "./UsersList";
 import MessageBox from "./MessageBox";
 import logoZap from "./rzapLogo-1.png";
-import style from "./style/style.module.css"
-
+import style from "./style/style.module.css";
 
 // Use for remote connections
 const configuration = {
-  iceServers: [{ url: "stun:stun.1.google.com:19302" }]
+  iceServers: [{ url: "stun:stun.1.google.com:19302" }],
 };
 
 // Use for local connections
@@ -42,10 +41,10 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
   const [messages, setMessages] = useState({});
 
   useEffect(() => {
-    webSocket.current = new WebSocket('ws://localhost:9000');
-    webSocket.current.onmessage = message => {
+    webSocket.current = new WebSocket("ws://localhost:9000");
+    webSocket.current.onmessage = (message) => {
       const data = JSON.parse(message.data);
-      setSocketMessages(prev => [...prev, data]);
+      setSocketMessages((prev) => [...prev, data]);
     };
     webSocket.current.onclose = () => {
       webSocket.current.close();
@@ -53,6 +52,7 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
     return () => webSocket.current.close();
   }, []);
 
+  // Fica escutando Mensagens do servidor para disparar Triggers
   useEffect(() => {
     let data = socketMessages.pop();
     if (data) {
@@ -88,29 +88,30 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
     setAlert(null);
   };
 
-  const send = data => {
+  // Caso Basico de envio, para se comunicar do Sinaling-Server
+  const send = (data) => {
     webSocket.current.send(JSON.stringify(data));
   };
 
+  // Mensagem que dispara do Triger de Login
   const handleLogin = () => {
     setLoggingIn(true);
     send({
       type: "login",
-      name
+      name,
     });
   };
 
   const toggleRandomConnection = (users) => {
-    
     if (users.length < 2) {
       console.log("Não há usuários suficientes para conectar.");
       return;
     }
-  
+
     let randomIndex;
     do {
-    // Obtenha um índice aleatório
-    randomIndex = Math.floor(Math.random() * users.length);
+      // Obtenha um índice aleatório
+      randomIndex = Math.floor(Math.random() * users.length);
     } while (randomIndex === 0);
     console.log(users[1].userName);
     // Selecione o usuário aleatório
@@ -120,16 +121,16 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
     // Inicie a conexão com o usuário aleatório
     console.log(users[randomIndex].userName);
     toggleConnection(users[randomIndex].userName);
-    
   };
-
+  // Atualiza lista de usuarios online
   const updateUsersList = ({ user }) => {
-    setUsers(prev => [...prev, user]);
+    setUsers((prev) => [...prev, user]);
   };
 
+  // Remove os usuarios da lista, chamada quando a guia é fechada, executada por JS
   const removeUser = ({ user }) => {
-    setUsers(prev => prev.filter(u => u.userName !== user.userName));
-  }
+    setUsers((prev) => prev.filter((u) => u.userName !== user.userName));
+  };
 
   const handleDataChannelMessageReceived = ({ data }) => {
     const message = JSON.parse(data);
@@ -148,6 +149,7 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
     }
   };
 
+  // Função executando quando o trigger de login é ativado pelo servidor 
   const onLogin = ({ success, message, users: loggedIn }) => {
     setLoggingIn(false);
     if (success) {
@@ -163,7 +165,7 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
       );
       setIsLoggedIn(true);
       setUsers(loggedIn);
-      console.dir("users lista: "+ loggedIn);
+      console.dir("users lista: " + loggedIn);
       console.log("users:0" + users);
       console.log(JSON.stringify(loggedIn, null, 2));
       let localConnection = new RTCPeerConnection(configuration);
@@ -176,11 +178,11 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
           send({
             name: connectedTo,
             type: "candidate",
-            candidate
+            candidate,
           });
         }
       };
-      localConnection.ondatachannel = event => {
+      localConnection.ondatachannel = (event) => {
         console.log("Data channel is created!");
         let receiveChannel = event.channel;
         receiveChannel.onopen = () => {
@@ -213,11 +215,11 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
     connection
       .setRemoteDescription(new RTCSessionDescription(offer))
       .then(() => connection.createAnswer())
-      .then(answer => connection.setLocalDescription(answer))
+      .then((answer) => connection.setLocalDescription(answer))
       .then(() =>
         send({ type: "answer", answer: connection.localDescription, name })
       )
-      .catch(e => {
+      .catch((e) => {
         console.log({ e });
         setAlert(
           <SweetAlert
@@ -233,17 +235,17 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
       });
   };
 
-  //when another user answers to our offer
+  //Quando um usuario responde sua oferta de conexão
   const onAnswer = ({ answer }) => {
     connection.setRemoteDescription(new RTCSessionDescription(answer));
   };
 
-  //when we got ice candidate from another user
+  //Função para adicionar um ice candidate e manter conexão
   const onCandidate = ({ candidate }) => {
     connection.addIceCandidate(new RTCIceCandidate(candidate));
   };
 
-  //when a user clicks the send message button
+  //Executada quando usuario clica em enviar Mensagens
   const sendMsg = () => {
     const time = format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
     let text = { time, message, name };
@@ -253,7 +255,7 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
     if (messages[connectedTo]) {
       userMessages = [...userMessages, text];
       let newMessages = Object.assign({}, messages, {
-        [connectedTo]: userMessages
+        [connectedTo]: userMessages,
       });
       messagesRef.current = newMessages;
       setMessages(newMessages);
@@ -266,14 +268,14 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
     setMessage("");
   };
 
-  const handleConnection = name => {
+  const handleConnection = (name) => {
     var dataChannelOptions = {
-      reliable: true
+      reliable: true,
     };
 
     let dataChannel = connection.createDataChannel("messenger");
 
-    dataChannel.onerror = error => {
+    dataChannel.onerror = (error) => {
       setAlert(
         <SweetAlert
           warning
@@ -292,11 +294,11 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
 
     connection
       .createOffer()
-      .then(offer => connection.setLocalDescription(offer))
+      .then((offer) => connection.setLocalDescription(offer))
       .then(() =>
         send({ type: "offer", offer: connection.localDescription, name })
       )
-      .catch(e =>
+      .catch((e) =>
         setAlert(
           <SweetAlert
             warning
@@ -311,8 +313,8 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
       );
   };
 
-  const toggleConnection = userName => {
-    console.log("togle"+userName);
+  const toggleConnection = (userName) => {
+    console.log("togle" + userName);
     if (connectedRef.current === userName) {
       setConnecting(true);
       setConnectedTo("");
@@ -342,7 +344,7 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
                   fluid
                   disabled={loggingIn}
                   type="text"
-                  onChange={e => setName(e.target.value)}
+                  onChange={(e) => setName(e.target.value)}
                   placeholder="Username..."
                   action
                 >
@@ -378,13 +380,14 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
               sendMsg={sendMsg}
               name={name}
             />
-            <Button
-            onClick={() => toggleRandomConnection(users)}
-            disabled={!users || users.length < 2}
+            <div
+              onClick={() => toggleRandomConnection(users)}
+              disabled={!users || users.length < 2}
+              className={style.randomBtn}
             >
-            <Icon name="random" />
-            Conectar Aleatoriamente
-            </Button>
+              <Icon name="random" />
+              Conectar Aleatoriamente
+            </div>
           </Grid>
         </Fragment>
       )) || (

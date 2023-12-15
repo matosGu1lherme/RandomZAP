@@ -1,0 +1,25 @@
+.TitleZap {
+    color: gold;
+    text-transform: capitalize;
+    
+}
+
+.randomBtn {
+    height: 100px;
+    width: 150px;
+    border-radius: 50px;
+    background-color: gold;
+    color: white;
+    cursor: pointer;
+    font-size: 18px;
+    padding-top: 25px;
+    font-weight: 700;
+
+    position: absolute;
+    bottom: 10%;
+    left: 50%;
+
+    &::hover {
+        background-color: rgb(9, 33, 217);
+    }
+}   
