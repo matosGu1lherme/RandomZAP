@@ -31,6 +31,9 @@ O RandomZAP é um projeto de sistemas distribuidos que conecta dois clientes des
 
 - Cliente podera conversar com **N** pessoas aleatorias
 
+## WebRTC
+A comunicação entre os cliente é feita pela serviço do WebRTC, que implementa funcionalidade de comunicação peer to peer, além de administrar autorização e tranmissão de dados como audio, video etc. Dentro do projeto a biblioteca é usada para comunicação dos web chats após estabelecimento da conexão pelo sinaling-server
+
 ## Stun-SERVER
 Para realizar a conexão passando pelo NAT, é necessario realizar antes uma conexão com o stun server para solicitar dados como, IP e Portas publicas de conexão.
 
@@ -53,6 +56,12 @@ O servidor recebe conexões dos usúarios da interface grafíca, por meio de Web
 5 - O servidor encaminha a mensagem para o candidato escolhido, e atravez dos dados da conexão SDP é estabelecido uma conexão peerTopeer
 
 ## Como Rodar
+#### Migrações do Banco de dados
+* Criar no banco de dados MySql a tabela "random_zap"
+* cd sinaling_server
+* yarn db:makemigrations --name whatever
+* yarn sequelize db:migrate
+
 #### Sinalig Server
 * cd sinaling_server
 * yarn install
