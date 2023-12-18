@@ -6,18 +6,19 @@ import {
   Grid,
   Segment,
   Button,
-  Loader
+  Loader,
 } from "semantic-ui-react";
 import SweetAlert from "react-bootstrap-sweetalert";
 import { format } from "date-fns";
 import "./stylesApp.css";
 import UsersList from "./UsersList";
 import MessageBox from "./MessageBox";
-import { useLocation } from 'react-router-dom';
+import logoZap from "../Home/rzapLogo-1.png";
+import style from "./style.module.css";
 
 // Use for remote connections
 const configuration = {
-  iceServers: [{ url: "stun:stun.1.google.com:19302" }]
+  iceServers: [{ url: "stun:stun.1.google.com:19302" }],
 };
 
 // Use for local connections
@@ -39,13 +40,12 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
   const [message, setMessage] = useState("");
   const messagesRef = useRef({});
   const [messages, setMessages] = useState({});
- 
 
   useEffect(() => {
-    webSocket.current = new WebSocket('ws://localhost:9000');
-    webSocket.current.onmessage = message => {
+    webSocket.current = new WebSocket("ws://localhost:9000");
+    webSocket.current.onmessage = (message) => {
       const data = JSON.parse(message.data);
-      setSocketMessages(prev => [...prev, data]);
+      setSocketMessages((prev) => [...prev, data]);
     };
     webSocket.current.onclose = () => {
       webSocket.current.close();
@@ -88,7 +88,7 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
     setAlert(null);
   };
 
-  const send = data => {
+  const send = (data) => {
     webSocket.current.send(JSON.stringify(data));
   };
 
@@ -96,17 +96,16 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
     setLoggingIn(true);
     send({
       type: "login",
-      name
+      name,
     });
   };
 
   const toggleRandomConnection = (usersCopy) => {
-    
     if (users.length < 1) {
       console.log("Não há usuários suficientes para conectar.");
       return;
     }
-  
+
     let randomIndex;
     // do {
     // Obtenha um índice aleatório
@@ -118,20 +117,22 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
   };
 
   const updateUsersList = ({ user }) => {
-    setUsers(prev => [...prev, user]);
+    setUsers((prev) => [...prev, user]);
   };
 
   const removeUser = ({ user }) => {
-    setUsers(prev => prev.filter(u => u.userName !== user.userName));
-  }
+    setUsers((prev) => prev.filter((u) => u.userName !== user.userName));
+  };
 
   // const updateUsersCopyList = ({ userCopy }) => {
   //   setUsersCopy(prev => [...prev, userCopy]);
   // };
 
   const removeCopyUser = ({ userCopy }) => {
-    setUsersCopy(prev => prev.filter(u => u.userName !== userCopy.userName));
-  }
+    setUsersCopy((prev) =>
+      prev.filter((u) => u.userName !== userCopy.userName)
+    );
+  };
 
   const handleDataChannelMessageReceived = ({ data }) => {
     const message = JSON.parse(data);
@@ -166,7 +167,7 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
       setIsLoggedIn(true);
       setUsers(loggedIn);
       setUsersCopy(loggedIn);
-      console.dir("users lista: "+ loggedIn);
+      console.dir("users lista: " + loggedIn);
       console.log("users:0" + users);
       console.log(JSON.stringify(loggedIn, null, 2));
       let localConnection = new RTCPeerConnection(configuration);
@@ -179,11 +180,11 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
           send({
             name: connectedTo,
             type: "candidate",
-            candidate
+            candidate,
           });
         }
       };
-      localConnection.ondatachannel = event => {
+      localConnection.ondatachannel = (event) => {
         console.log("Data channel is created!");
         let receiveChannel = event.channel;
         receiveChannel.onopen = () => {
@@ -216,11 +217,11 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
     connection
       .setRemoteDescription(new RTCSessionDescription(offer))
       .then(() => connection.createAnswer())
-      .then(answer => connection.setLocalDescription(answer))
+      .then((answer) => connection.setLocalDescription(answer))
       .then(() =>
         send({ type: "answer", answer: connection.localDescription, name })
       )
-      .catch(e => {
+      .catch((e) => {
         console.log({ e });
         setAlert(
           <SweetAlert
@@ -256,7 +257,7 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
     if (messages[connectedTo]) {
       userMessages = [...userMessages, text];
       let newMessages = Object.assign({}, messages, {
-        [connectedTo]: userMessages
+        [connectedTo]: userMessages,
       });
       messagesRef.current = newMessages;
       setMessages(newMessages);
@@ -269,14 +270,14 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
     setMessage("");
   };
 
-  const handleConnection = name => {
+  const handleConnection = (name) => {
     var dataChannelOptions = {
-      reliable: true
+      reliable: true,
     };
 
     let dataChannel = connection.createDataChannel("messenger");
 
-    dataChannel.onerror = error => {
+    dataChannel.onerror = (error) => {
       setAlert(
         <SweetAlert
           warning
@@ -295,11 +296,11 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
 
     connection
       .createOffer()
-      .then(offer => connection.setLocalDescription(offer))
+      .then((offer) => connection.setLocalDescription(offer))
       .then(() =>
         send({ type: "offer", offer: connection.localDescription, name })
       )
-      .catch(e =>
+      .catch((e) =>
         setAlert(
           <SweetAlert
             warning
@@ -314,8 +315,8 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
       );
   };
 
-  const toggleConnection = userName => {
-    console.log("togle"+userName);
+  const toggleConnection = (userName) => {
+    console.log("togle" + userName);
     if (connectedRef.current === userName) {
       setConnecting(true);
       setConnectedTo("");
@@ -333,8 +334,8 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
     <div className="App">
       {alert}
       <Header as="h2" icon>
-        <Icon name="users" />
-        RandomZap Chat
+        <img src={logoZap}></img>
+        <span className={style.TitleZap}>RandomZap Chat</span>
       </Header>
       {(socketOpen && (
         <Fragment>
@@ -345,13 +346,13 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
                   fluid
                   disabled={loggingIn}
                   type="text"
-                  onChange={e => setName(e.target.value)}
+                  onChange={(e) => setName(e.target.value)}
                   placeholder="Username..."
                   action
                 >
                   <input />
                   <Button
-                    color="teal"
+                    color="yellow"
                     disabled={!name || loggingIn}
                     onClick={handleLogin}
                   >
@@ -381,13 +382,14 @@ const Chat = ({ connection, updateConnection, channel, updateChannel }) => {
               sendMsg={sendMsg}
               name={name}
             />
-            <Button
-            onClick={() => toggleRandomConnection(usersCopy)}
-            disabled={!usersCopy || usersCopy.length < 2}
+            <div
+              onClick={() => toggleRandomConnection(usersCopy)}
+              disabled={!usersCopy || usersCopy.length < 2}
+              className={style.randomBtn}
             >
-            <Icon name="random" />
-            Conectar Aleatoriamente
-            </Button>
+              <Icon name="random" />
+              Conectar Aleatoriamente
+            </div>
           </Grid>
         </Fragment>
       )) || (
