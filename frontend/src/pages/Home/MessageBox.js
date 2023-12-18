@@ -20,7 +20,7 @@ const MessageBox = ({ messages, connectedTo, message, setMessage, sendMsg, name 
         <Card fluid>
           <Card.Content
             header={
-              !!connectedTo ? connectedTo : "Not chatting with anyone currently"
+              !!connectedTo ? connectedTo : "Sem Conexão"
             }
           />
           <Card.Content>
@@ -45,7 +45,7 @@ const MessageBox = ({ messages, connectedTo, message, setMessage, sendMsg, name 
               <Segment placeholder>
                 <Header icon>
                   <Icon name="discussions" />
-                  No messages available yet
+                  Sem Mensagens
                 </Header>
               </Segment>
             )}

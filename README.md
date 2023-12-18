@@ -77,6 +77,10 @@ O servidor recebe conexões dos usúarios da interface grafíca, por meio de Web
 
 <img src="arquiteturaSD.png">
 
+### Link Para Video Apresentação Google Drive
+
+https://drive.google.com/file/d/14yJoznmGlDrEAT6v48yKaMuFTdA8YE3t/view?usp=sharing
+
 ## Equipe
 - Catarine Cruz
 - Guilherme Matos 

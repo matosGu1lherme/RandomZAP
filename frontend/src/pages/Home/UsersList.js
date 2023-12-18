@@ -82,15 +82,7 @@ const UsersList = ({ users, toggleConnection, connectedTo, connecting }) => {
               {users.map(({ userName }) => (
                 <List.Item key={userName}>
                   <List.Content floated="right">
-                    <Button
-                      onClick={() => {
-                        toggleConnection(userName);
-                      }}
-                      disabled={!!connectedTo && connectedTo !== userName}
-                      loading={connectedTo === userName && connecting}
-                    >
-                      {connectedTo === userName ? "Disconnect" : "Connect"}
-                    </Button>
+
                   </List.Content>
                   <Image avatar src={avatar} />
                   <List.Content>
